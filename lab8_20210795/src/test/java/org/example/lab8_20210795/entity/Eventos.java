@@ -23,6 +23,6 @@ public class Eventos {
     private Integer capacidadMax;
     @Column(name = "NumReservasActual", nullable = false)
     private Integer numReservasActual;
-    @Column(name = "Fecha", nullable = false, length = 45)
+    @Column(name = "Fecha", nullable = false)
     private Date fecha;
 }

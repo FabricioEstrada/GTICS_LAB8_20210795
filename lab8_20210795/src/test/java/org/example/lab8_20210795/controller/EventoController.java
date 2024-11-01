@@ -18,7 +18,7 @@ public class EventoController {
 
     //LISTAR
     @GetMapping(value = {"/list", ""})
-    public List<Eventos> listaProductos() {
+    public List<Eventos> listaEventos() {
         return eventosRepository.findAll();
     }
 }
