@@ -14,7 +14,7 @@ USE `BaseDeDatosLab8` ;
 -- Table `BaseDeDatosLab8`.`Eventos`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Eventos` (
-  `idEventos` INT NOT NULL,
+  `idEventos` INT AUTO_INCREMENT NOT NULL,
   `Nombre` VARCHAR(45) NOT NULL,
   `Fecha` DATE NOT NULL,
   `Categoria` VARCHAR(45) NOT NULL,
@@ -50,7 +50,7 @@ INSERT INTO `BaseDeDatosLab8`.`Eventos` (`idEventos`, `Nombre`, `Fecha`, `Catego
 -- Table `BaseDeDatosLab8`.`Persona`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Persona` (
-  `idPersona` INT NOT NULL,
+  `idPersona` INT AUTO_INCREMENT NOT NULL,
   `Nombre` VARCHAR(45) NOT NULL,
   `Correo` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`idPersona`))
@@ -83,7 +83,7 @@ INSERT INTO `BaseDeDatosLab8`.`Persona` (`idPersona`, `Nombre`, `Correo`) VALUES
 -- Table `BaseDeDatosLab8`.`Registro`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Registro` (
-  `idRegistro` INT NOT NULL,
+  `idRegistro` INT AUTO_INCREMENT  NOT NULL,
   `Eventos_idEventos` INT NOT NULL,
   `Persona_idPersona` INT NOT NULL,
   PRIMARY KEY (`idRegistro`),

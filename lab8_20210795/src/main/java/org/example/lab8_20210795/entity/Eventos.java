@@ -1,5 +1,6 @@
 package org.example.lab8_20210795.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,5 +25,6 @@ public class Eventos {
     @Column(name = "NumReservasActual", nullable = false)
     private Integer numReservasActual;
     @Column(name = "Fecha", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date fecha;
 }
