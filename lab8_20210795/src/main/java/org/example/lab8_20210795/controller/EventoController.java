@@ -2,7 +2,9 @@ package org.example.lab8_20210795.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.lab8_20210795.entity.Eventos;
+import org.example.lab8_20210795.entity.Registro;
 import org.example.lab8_20210795.repository.EventosRepository;
+import org.example.lab8_20210795.repository.RegistroRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,8 +20,10 @@ import java.util.List;
 @RequestMapping("/eventos")
 public class EventoController {
     final EventosRepository eventosRepository;
-    public EventoController(EventosRepository eventosRepository) {
+    final RegistroRepository registroRepository;
+    public EventoController(EventosRepository eventosRepository, RegistroRepository registroRepository) {
         this.eventosRepository = eventosRepository;
+        this.registroRepository = registroRepository;
     }
 
     @GetMapping(value = {"/list", ""})
@@ -111,8 +115,47 @@ public class EventoController {
 
 
 
-    
 
+    @PostMapping("/registrar")
+    public ResponseEntity<HashMap<String, Object>> reservarLugar(@RequestBody Registro nuevoRegistro) {
+        HashMap<String, Object> responseJson = new HashMap<>();
+
+        try {
+            Eventos evento = eventosRepository.findById(nuevoRegistro.getEvento().getIdEventos()).orElse(null);
+            if (evento == null) {
+                responseJson.put("resultado", "failure");
+                responseJson.put("mensaje", "El evento no existe.");
+                return ResponseEntity.badRequest().body(responseJson);
+            }
+
+            // Validando cupos disponibles
+            int reservasActuales = evento.getNumReservasActual();
+            int capacidadMaxima = evento.getCapacidadMax();
+            int nuevosCupos = nuevoRegistro.getNumeroCuposReserva();
+
+            if (reservasActuales + nuevosCupos > capacidadMaxima) {
+                responseJson.put("resultado", "failure");
+                responseJson.put("mensaje", "No hay suficientes cupos disponibles para la reserva.");
+                return ResponseEntity.badRequest().body(responseJson);
+            }
+
+            // Si todo va bien se actualiza el evento con la cantidad nueva
+            evento.setNumReservasActual(reservasActuales + nuevosCupos);
+            eventosRepository.save(evento); // Evento Actualizado
+
+            // Guardando Reservea
+            registroRepository.save(nuevoRegistro); // Guardar la reserva en la base de datos (opcional)
+
+            responseJson.put("resultado", "successful");
+            responseJson.put("mensaje", "Reserva realizada con éxito.");
+            return ResponseEntity.ok(responseJson);
+
+        } catch (Exception e) {
+            responseJson.put("resultado", "failure");
+            responseJson.put("mensaje", "Ocurrió un error al registrar la reserva.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseJson);
+        }
+    }
 
 
 

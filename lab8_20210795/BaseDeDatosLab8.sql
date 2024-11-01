@@ -46,73 +46,47 @@ INSERT INTO `BaseDeDatosLab8`.`Eventos` (`idEventos`, `Nombre`, `Fecha`, `Catego
 (19, 'Concurso de Fotografía', '2024-11-23', 'Arte', 80, 40),
 (20, 'Seminario de Liderazgo', '2024-11-24', 'Negocios', 60, 55);
 
--- -----------------------------------------------------
--- Table `BaseDeDatosLab8`.`Persona`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Persona` (
-  `idPersona` INT AUTO_INCREMENT NOT NULL,
-  `Nombre` VARCHAR(45) NOT NULL,
-  `Correo` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`idPersona`))
-ENGINE = InnoDB;
-
--- Inserciones en la tabla Persona
-INSERT INTO `BaseDeDatosLab8`.`Persona` (`idPersona`, `Nombre`, `Correo`) VALUES
-(1, 'Ana García', 'ana.garcia@example.com'),
-(2, 'Luis Pérez', 'luis.perez@example.com'),
-(3, 'Carlos Martínez', 'carlos.martinez@example.com'),
-(4, 'María López', 'maria.lopez@example.com'),
-(5, 'Juan Torres', 'juan.torres@example.com'),
-(6, 'Laura Sánchez', 'laura.sanchez@example.com'),
-(7, 'Pedro Ramírez', 'pedro.ramirez@example.com'),
-(8, 'Elena Fernández', 'elena.fernandez@example.com'),
-(9, 'Rosa Jiménez', 'rosa.jimenez@example.com'),
-(10, 'Miguel Moreno', 'miguel.moreno@example.com'),
-(11, 'Sofía Gómez', 'sofia.gomez@example.com'),
-(12, 'Diego Castillo', 'diego.castillo@example.com'),
-(13, 'Andrea Herrera', 'andrea.herrera@example.com'),
-(14, 'Oscar Cruz', 'oscar.cruz@example.com'),
-(15, 'Pablo Rojas', 'pablo.rojas@example.com'),
-(16, 'Carolina Reyes', 'carolina.reyes@example.com'),
-(17, 'Gabriel Vázquez', 'gabriel.vazquez@example.com'),
-(18, 'Isabel Peña', 'isabel.pena@example.com'),
-(19, 'Tomás Delgado', 'tomas.delgado@example.com'),
-(20, 'Valeria Méndez', 'valeria.mendez@example.com');
 
 -- -----------------------------------------------------
--- Table `BaseDeDatosLab8`.`Registro`
+-- Table `basededatoslab8`.`registro`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Registro` (
-  `idRegistro` INT AUTO_INCREMENT  NOT NULL,
+CREATE TABLE IF NOT EXISTS `basededatoslab8`.`registro` (
+  `idRegistro` INT NOT NULL AUTO_INCREMENT,
   `Eventos_idEventos` INT NOT NULL,
-  `Persona_idPersona` INT NOT NULL,
+  `NombreApellidoPersona` VARCHAR(100) NOT NULL,
+  `CorreoPersona` VARCHAR(100) NOT NULL,
+  `NumCuposReserva` INT NOT NULL DEFAULT '1',
   PRIMARY KEY (`idRegistro`),
   INDEX `fk_Registro_Eventos_idx` (`Eventos_idEventos` ASC) VISIBLE,
-  INDEX `fk_Registro_Persona1_idx` (`Persona_idPersona` ASC) VISIBLE,
   CONSTRAINT `fk_Registro_Eventos`
     FOREIGN KEY (`Eventos_idEventos`)
-    REFERENCES `BaseDeDatosLab8`.`Eventos` (`idEventos`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Registro_Persona1`
-    FOREIGN KEY (`Persona_idPersona`)
-    REFERENCES `BaseDeDatosLab8`.`Persona` (`idPersona`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+    REFERENCES `basededatoslab8`.`eventos` (`idEventos`)
+) ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
 
 -- Inserciones en la tabla Registro
-INSERT INTO `BaseDeDatosLab8`.`Registro` (`idRegistro`, `Eventos_idEventos`, `Persona_idPersona`) VALUES
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 3),
-(4, 4, 4),
-(5, 5, 5),
-(6, 6, 6),
-(7, 7, 7),
-(8, 8, 8),
-(9, 9, 9),
-(10, 10, 10);
+INSERT INTO `basededatoslab8`.`registro` (`Eventos_idEventos`, `NombreApellidoPersona`, `CorreoPersona`, `NumCuposReserva`) VALUES
+(1, 'Ana García', 'ana.garcia@example.com', 1),
+(2, 'Luis Pérez', 'luis.perez@example.com', 1),
+(3, 'Carlos Martínez', 'carlos.martinez@example.com', 1),
+(4, 'María López', 'maria.lopez@example.com', 1),
+(5, 'Juan Torres', 'juan.torres@example.com', 1),
+(6, 'Laura Sánchez', 'laura.sanchez@example.com', 1),
+(7, 'Pedro Ramírez', 'pedro.ramirez@example.com', 1),
+(8, 'Elena Fernández', 'elena.fernandez@example.com', 1),
+(9, 'Rosa Jiménez', 'rosa.jimenez@example.com', 1),
+(10, 'Miguel Moreno', 'miguel.moreno@example.com', 1),
+(11, 'Sofía Gómez', 'sofia.gomez@example.com', 1),
+(12, 'Diego Castillo', 'diego.castillo@example.com', 1),
+(13, 'Andrea Herrera', 'andrea.herrera@example.com', 1),
+(14, 'Oscar Cruz', 'oscar.cruz@example.com', 1),
+(15, 'Pablo Rojas', 'pablo.rojas@example.com', 1),
+(16, 'Carolina Reyes', 'carolina.reyes@example.com', 1),
+(17, 'Gabriel Vázquez', 'gabriel.vazquez@example.com', 1),
+(18, 'Isabel Peña', 'isabel.pena@example.com', 1),
+(19, 'Tomás Delgado', 'tomas.delgado@example.com', 1),
+(20, 'Valeria Méndez', 'valeria.mendez@example.com', 1);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

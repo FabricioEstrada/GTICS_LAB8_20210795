@@ -14,6 +14,9 @@ public class Registro {
     @Column(name = "idRegistro", nullable = false)
     private Integer idRegistro;
 
+    @Column(name = "NumCuposReserva", nullable = false)
+    private Integer numeroCuposReserva;
+
     @ManyToOne
     @JoinColumn(name = "Eventos_idEventos", nullable = false)
     private Eventos evento;
