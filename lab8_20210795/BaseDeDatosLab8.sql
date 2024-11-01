@@ -11,45 +11,46 @@ USE `BaseDeDatosLab8` ;
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Table `mydb`.`Eventos`
+-- Table `BaseDeDatosLab8`.`Eventos`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Eventos` (
   `idEventos` INT NOT NULL,
   `Nombre` VARCHAR(45) NOT NULL,
   `Fecha` DATE NOT NULL,
   `Categoria` VARCHAR(45) NOT NULL,
-  `CapacidadMax` VARCHAR(45) NOT NULL,
-  `NumReservasActual` VARCHAR(45) NOT NULL,
+  `CapacidadMax` INT NOT NULL,
+  `NumReservasActual` INT NOT NULL,
   PRIMARY KEY (`idEventos`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Persona`
+-- Table `BaseDeDatosLab8`.`Persona`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Persona` (
   `idPersona` INT NOT NULL,
   `Nombre` VARCHAR(45) NOT NULL,
-  `Correo` VARCHAR(45) NOT NULL,
+  `Correo` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`idPersona`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Eventos_has_Persona`
+-- Table `BaseDeDatosLab8`.`Registro`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Eventos_has_Persona` (
+CREATE TABLE IF NOT EXISTS `BaseDeDatosLab8`.`Registro` (
+  `idRegistro` INT NOT NULL,
   `Eventos_idEventos` INT NOT NULL,
   `Persona_idPersona` INT NOT NULL,
-  PRIMARY KEY (`Eventos_idEventos`, `Persona_idPersona`),
-  INDEX `fk_Eventos_has_Persona_Persona1_idx` (`Persona_idPersona` ASC) VISIBLE,
-  INDEX `fk_Eventos_has_Persona_Eventos_idx` (`Eventos_idEventos` ASC) VISIBLE,
-  CONSTRAINT `fk_Eventos_has_Persona_Eventos`
+  PRIMARY KEY (`idRegistro`),
+  INDEX `fk_Registro_Eventos_idx` (`Eventos_idEventos` ASC) VISIBLE,
+  INDEX `fk_Registro_Persona1_idx` (`Persona_idPersona` ASC) VISIBLE,
+  CONSTRAINT `fk_Registro_Eventos`
     FOREIGN KEY (`Eventos_idEventos`)
     REFERENCES `BaseDeDatosLab8`.`Eventos` (`idEventos`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Eventos_has_Persona_Persona1`
+  CONSTRAINT `fk_Registro_Persona1`
     FOREIGN KEY (`Persona_idPersona`)
     REFERENCES `BaseDeDatosLab8`.`Persona` (`idPersona`)
     ON DELETE NO ACTION
