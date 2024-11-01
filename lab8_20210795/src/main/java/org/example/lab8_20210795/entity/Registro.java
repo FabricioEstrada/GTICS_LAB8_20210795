@@ -14,6 +14,13 @@ public class Registro {
     @Column(name = "idRegistro", nullable = false)
     private Integer idRegistro;
 
+    @Column(name = "NombreApellidoPersona", nullable = false, length = 100)
+    private String nombreApellido;
+
+    @Column(name = "CorreoPersona", nullable = false, length = 100)
+    private String correo;
+
+
     @Column(name = "NumCuposReserva", nullable = false)
     private Integer numeroCuposReserva;
 
@@ -21,7 +28,4 @@ public class Registro {
     @JoinColumn(name = "Eventos_idEventos", nullable = false)
     private Eventos evento;
 
-    @ManyToOne
-    @JoinColumn(name = "Persona_idPersona", nullable = false)
-    private Persona persona;
 }

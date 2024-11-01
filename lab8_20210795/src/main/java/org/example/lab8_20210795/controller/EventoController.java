@@ -121,6 +121,17 @@ public class EventoController {
         HashMap<String, Object> responseJson = new HashMap<>();
 
         try {
+            // Validando que se hayan pasado correctamente los datos al registro
+            if (nuevoRegistro.getEvento() == null ||
+                    nuevoRegistro.getNumeroCuposReserva() <= 0 ||
+                    nuevoRegistro.getNombreApellido() == null || nuevoRegistro.getNombreApellido().isEmpty() ||
+                    nuevoRegistro.getCorreo() == null || nuevoRegistro.getCorreo().isEmpty()) {
+
+                responseJson.put("resultado", "failure");
+                responseJson.put("mensaje", "Datos de reserva inválidos. Todos los campos (evento, numeroCuposReserva, nombreApellidoPersona y correoPersona) son obligatorios.");
+                return ResponseEntity.badRequest().body(responseJson);
+            }
+
             Eventos evento = eventosRepository.findById(nuevoRegistro.getEvento().getIdEventos()).orElse(null);
             if (evento == null) {
                 responseJson.put("resultado", "failure");
@@ -139,15 +150,16 @@ public class EventoController {
                 return ResponseEntity.badRequest().body(responseJson);
             }
 
-            // Si todo va bien se actualiza el evento con la cantidad nueva
+            // Si itodo va bien se actualiza el evento con la cantidad nueva
             evento.setNumReservasActual(reservasActuales + nuevosCupos);
             eventosRepository.save(evento); // Evento Actualizado
 
-            // Guardando Reservea
-            registroRepository.save(nuevoRegistro); // Guardar la reserva en la base de datos (opcional)
+            // Guardando Reserva
+            registroRepository.save(nuevoRegistro);
 
             responseJson.put("resultado", "successful");
             responseJson.put("mensaje", "Reserva realizada con éxito.");
+            responseJson.put("Id del Registro", nuevoRegistro.getIdRegistro());
             return ResponseEntity.ok(responseJson);
 
         } catch (Exception e) {
@@ -165,7 +177,7 @@ public class EventoController {
         HashMap<String, String> responseMap = new HashMap<>();
         if (request.getMethod().equals("POST") || request.getMethod().equals("PUT")) {
             responseMap.put("estado", "error");
-            responseMap.put("msg", "Debe enviar un producto");
+            responseMap.put("msg", "Debe enviar el evento o el registro correctamente");
         }
         return ResponseEntity.badRequest().body(responseMap);
     }
