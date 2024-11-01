@@ -15,13 +15,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/eventos")
-public class EventoController {
+public class ControllerGeneral {
     final EventosRepository eventosRepository;
     final RegistroRepository registroRepository;
-    public EventoController(EventosRepository eventosRepository, RegistroRepository registroRepository) {
+    public ControllerGeneral(EventosRepository eventosRepository, RegistroRepository registroRepository) {
         this.eventosRepository = eventosRepository;
         this.registroRepository = registroRepository;
     }
@@ -36,7 +37,7 @@ public class EventoController {
                 // Validando formato
                 if (!fecha.matches("\\d{2}-\\d{2}-\\d{4}")) {
                     responseJson.put("result", "failure");
-                    responseJson.put("mensaje", "Formato de fecha inválido. Utilice 'dd-MM-yyyy'.");
+                    responseJson.put("msg", "Formato de fecha inválido. Utilice 'dd-MM-yyyy'.");
                     return ResponseEntity.badRequest().body(responseJson);
                 }
                 try {
@@ -55,7 +56,7 @@ public class EventoController {
                 eventos = eventosRepository.findAllByOrderByFechaAsc(); // Lista de eventos ordenados por fecha
             }
 
-            responseJson.put("result", "success");
+            responseJson.put("result", "successfull");
             responseJson.put("eventos", eventos);
             return ResponseEntity.ok(responseJson);
 
@@ -79,15 +80,15 @@ public class EventoController {
                     nuevoEvento.getCapacidadMax() == null ||
                     nuevoEvento.getFecha() == null) {
 
-                responseJson.put("resultado", "failure");
-                responseJson.put("mensaje", "Todos los campos (nombreEvento, categoria, capacidadMax, fecha) son obligatorios.");
+                responseJson.put("result", "failure");
+                responseJson.put("msg", "Todos los campos (nombreEvento, categoria, capacidadMax, fecha) son obligatorios.");
                 return ResponseEntity.badRequest().body(responseJson);
             }
 
             // Validar fecha a futuro
             if (nuevoEvento.getFecha().before(fechaActual)) {
-                responseJson.put("resultado", "failure");
-                responseJson.put("mensaje", "La fecha del evento debe ser en el futuro o asegurese que el formato sea 'dd-MM-yyyy'.");
+                responseJson.put("result", "failure");
+                responseJson.put("msg", "La fecha del evento debe ser en el futuro o asegurese que el formato sea 'dd-MM-yyyy'.");
                 return ResponseEntity.badRequest().body(responseJson);
             }
 
@@ -97,7 +98,7 @@ public class EventoController {
             // Guardar el evento en la base de datos
             Eventos eventoGuardado = eventosRepository.save(nuevoEvento);
 
-            responseJson.put("resultado", "succesful");
+            responseJson.put("result", "succesful");
             responseJson.put("estado", "¡creado!");
 
             if (fetchId) {
@@ -107,8 +108,8 @@ public class EventoController {
             return ResponseEntity.status(HttpStatus.CREATED).body(responseJson);
 
         } catch (Exception e) {
-            responseJson.put("resultado", "failure");
-            responseJson.put("mensaje", "Ocurrió un error al crear el evento.");
+            responseJson.put("result", "failure");
+            responseJson.put("msg", "Ocurrió un error al crear el evento.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseJson);
         }
     }
@@ -127,15 +128,15 @@ public class EventoController {
                     nuevoRegistro.getNombreApellido() == null || nuevoRegistro.getNombreApellido().isEmpty() ||
                     nuevoRegistro.getCorreo() == null || nuevoRegistro.getCorreo().isEmpty()) {
 
-                responseJson.put("resultado", "failure");
-                responseJson.put("mensaje", "Datos de reserva inválidos. Todos los campos (evento, numeroCuposReserva, nombreApellidoPersona y correoPersona) son obligatorios.");
+                responseJson.put("result", "failure");
+                responseJson.put("msg", "Datos de reserva inválidos. Todos los campos (evento, numeroCuposReserva, nombreApellidoPersona y correoPersona) son obligatorios.");
                 return ResponseEntity.badRequest().body(responseJson);
             }
 
             Eventos evento = eventosRepository.findById(nuevoRegistro.getEvento().getIdEventos()).orElse(null);
             if (evento == null) {
-                responseJson.put("resultado", "failure");
-                responseJson.put("mensaje", "El evento no existe.");
+                responseJson.put("result", "failure");
+                responseJson.put("msg", "El evento no existe.");
                 return ResponseEntity.badRequest().body(responseJson);
             }
 
@@ -145,8 +146,8 @@ public class EventoController {
             int nuevosCupos = nuevoRegistro.getNumeroCuposReserva();
 
             if (reservasActuales + nuevosCupos > capacidadMaxima) {
-                responseJson.put("resultado", "failure");
-                responseJson.put("mensaje", "No hay suficientes cupos disponibles para la reserva.");
+                responseJson.put("result", "failure");
+                responseJson.put("msg", "No hay suficientes cupos disponibles para la reserva.");
                 return ResponseEntity.badRequest().body(responseJson);
             }
 
@@ -157,19 +158,60 @@ public class EventoController {
             // Guardando Reserva
             registroRepository.save(nuevoRegistro);
 
-            responseJson.put("resultado", "successful");
-            responseJson.put("mensaje", "Reserva realizada con éxito.");
+            responseJson.put("result", "successful");
+            responseJson.put("msg", "Reserva realizada con éxito.");
             responseJson.put("Id del Registro", nuevoRegistro.getIdRegistro());
             return ResponseEntity.ok(responseJson);
 
         } catch (Exception e) {
-            responseJson.put("resultado", "failure");
-            responseJson.put("mensaje", "Ocurrió un error al registrar la reserva.");
+            responseJson.put("result", "failure");
+            responseJson.put("msg", "Ocurrió un error al registrar la reserva.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseJson);
         }
     }
 
 
+    @DeleteMapping("/borrar")
+    public ResponseEntity<HashMap<String, Object>> borrarReserva(@RequestParam("id") String idStr) {
+        HashMap<String, Object> rpta = new HashMap<>();
+
+        try {
+            int id = Integer.parseInt(idStr);
+
+            Optional<Registro> registroOptional = registroRepository.findById(id);
+            if (registroOptional.isPresent()) {
+                Registro registro = registroOptional.get();
+
+                // Obteniendo el evento asociado a la reserva
+                Eventos evento = eventosRepository.findById(registro.getEvento().getIdEventos()).orElse(null);
+                if (evento != null) {
+                    // Liberando los cupos que fueron reservador
+                    int numCuposReservados = registro.getNumeroCuposReserva();
+                    evento.setNumReservasActual(evento.getNumReservasActual() - numCuposReservados);
+                    eventosRepository.save(evento); // Actualizar el evento
+
+                    // Borrar el registro
+                    registroRepository.deleteById(id);
+
+                    rpta.put("result", "successful");
+                    rpta.put("msg", "Reserva borrada con éxito. Se han liberado " + numCuposReservados + " cupos.");
+                } else {
+                    rpta.put("result", "failure");
+                    rpta.put("msg", "El evento asociado a la reserva no existe.");
+                }
+            } else {
+                rpta.put("result", "failure");
+                rpta.put("msg", "El ID enviado no existe.");
+            }
+            return ResponseEntity.ok(rpta);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            rpta.put("result", "failure");
+            rpta.put("msg", "Ocurrió un error al intentar borrar la reserva.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(rpta);
+        }
+    }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
