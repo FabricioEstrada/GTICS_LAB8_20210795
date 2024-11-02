@@ -56,7 +56,6 @@ public class ControllerGeneral {
                 eventos = eventosRepository.findAllByOrderByFechaAsc(); // Lista de eventos ordenados por fecha
             }
 
-            responseJson.put("result", "successfull");
             responseJson.put("eventos", eventos);
             return ResponseEntity.ok(responseJson);
 
